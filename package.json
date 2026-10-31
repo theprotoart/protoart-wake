@@ -1,0 +1,16 @@
+{
+  "name": "protoart-wake",
+  "productName": "ProtoArt Wake",
+  "version": "2.0.2",
+  "description": "Keeps your Mac awake from the menu bar, using macOS\u2019s own power assertions. A native macOS app (Apple Silicon and Intel).",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "bash \"Build ProtoArt Wake.command\" --no-open",
+    "dmg": "bash \"Make DMG for friends.command\""
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

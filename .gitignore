@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# build output (publish DMGs as GitHub Release assets, not in the repo)
+dist/
+*.app/
+*.dmg
+*.dmg.sha256
+
+# build and deploy leftovers
+build-log.txt
+codesign-log.txt
+*-log.txt
+*.log
+*.tgz
+*.zip
+*.tmp
+.press-*
+
+# local test data and scratch folders (tests generate their own images)
+test-images/
+.verify*/
+.spike/
+.old/
+
+# older Swift prototype (not part of this project; includes a script that
+# deletes the Xcode command line tools)
+swift-version/
+
+# secrets that must never be committed
+.env
+.env.*
+*.pem
+*.p12
+*.key
+*.cer
+*.mobileprovision
+.npmrc
+
+# system and editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.amph_strings.txt

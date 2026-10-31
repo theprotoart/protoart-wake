@@ -1,0 +1,8 @@
+{
+  "name": "protoart-wake",
+  "productName": "ProtoArt Wake",
+  "version": "1.0.0",
+  "description": "Keeps your Mac awake, from the menu bar, using macOS's own power assertions.",
+  "main": "main.js",
+  "private": true
+}

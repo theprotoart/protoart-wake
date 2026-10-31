@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
+<title>ProtoArt Wake</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="wake.css">
+</head>
+<body class="finish-black wake">
+<div id="rack">
+  <canvas id="metal"></canvas>
+
+  <div id="brand">
+    <div class="brand-name">ProtoArt</div>
+    <div class="brand-sub">WAKE</div>
+    <div class="brand-rule"></div>
+    <div class="paint small">Model PW-2 · Keep-awake unit</div>
+  </div>
+  <div id="leds">
+    <div class="led-row" id="row-held"><span class="led green" id="led-held"></span><span class="engr">Held</span></div>
+    <div class="led-row" id="row-timer"><span class="led amber" id="led-timer"></span><span class="engr">Timer</span></div>
+    <div class="led-row" id="row-auto"><span class="led blue" id="led-auto"></span><span class="engr">Auto</span></div>
+  </div>
+
+  <div id="about-btn"></div>
+  <div id="pin-btn"></div>
+  <div id="setup-btn"></div>
+  <div id="tube-window" class="window"><div id="tube"></div><div class="scanlines"></div></div>
+  <div id="power"></div>
+  <div id="readouts">
+    <div class="readout"><span class="engr cap">Time left</span><div class="window amber-glass"><div class="seg" id="ro-left"></div></div><span class="engr unit" id="ro-left-u">MIN · SEC</span></div>
+    <div class="readout"><span class="engr cap">Awake for</span><div class="window amber-glass"><div class="seg" id="ro-for"></div></div><span class="engr unit" id="ro-for-u">MIN · SEC</span></div>
+  </div>
+
+  <div id="knob-duration" class="knob-slot"></div>
+  <div id="modes"></div>
+
+  <div id="auto" class="module f-bone">
+    <div class="auto-head">
+      <div class="mname">AUTO</div>
+      <div class="engr mfmt">Stay awake on its own</div>
+    </div>
+    <div id="auto-buttons"></div>
+    <div id="apps-wrap">
+      <div id="apps" class="window"><div id="app-list"></div><div class="scanlines"></div></div>
+    </div>
+  </div>
+
+  <div id="status" class="window"><div id="status-text"></div><div class="scanlines"></div></div>
+  <div id="footer-buttons"></div>
+
+
+  <!-- Set a time -->
+  <div id="custom" class="sheet" hidden>
+    <div class="paper" role="dialog" aria-label="Set a time">
+      <button class="close" data-close title="Close (Esc)">×</button>
+      <h1>Set a time</h1>
+      <section>
+        <h2>Keep awake for</h2>
+        <div class="line">
+          <input id="c-hours" type="number" min="0" max="24" value="1" aria-label="Hours"> <span>h</span>
+          <input id="c-mins" type="number" min="0" max="59" step="5" value="30" aria-label="Minutes"> <span>min</span>
+          <button class="go" id="c-for">START</button>
+        </div>
+      </section>
+      <section>
+        <h2>Keep awake until</h2>
+        <div class="line">
+          <input id="c-until" type="time" value="18:00" aria-label="Clock time">
+          <span class="hint" id="c-until-hint"></span>
+          <button class="go" id="c-until-go">START</button>
+        </div>
+      </section>
+      <section>
+        <h2>While an app is running</h2>
+        <div class="line">
+          <select id="c-app" aria-label="App"></select>
+          <button class="go" id="c-app-go">START</button>
+        </div>
+        <p class="note">Ends by itself when that app quits.</p>
+      </section>
+      <section>
+        <h2>While a file is downloading</h2>
+        <div class="line"><button class="go wide" id="c-file">CHOOSE FILE…</button></div>
+        <p class="note">Pick the download in progress (Chrome's .crdownload, Safari's .download, …). Ends when it finishes.</p>
+      </section>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div id="about" class="sheet" hidden>
+    <div class="paper" role="dialog" aria-label="How ProtoArt Wake works">
+      <button class="close" data-close title="Close (Esc)">×</button>
+      <h1>PW-2 Operator's Card</h1>
+      <p class="lede">ProtoArt Wake keeps your Mac from going to sleep for as long as you need, then lets it
+      sleep normally again. It lives in the menu bar: click the tube to open this panel, right-click it for quick timers.</p>
+
+      <h2>Power button</h2>
+      <p>Press it to keep the Mac awake; press again to let it sleep. The tube glows while it's on.
+      The menu-bar tube turns solid, and shows the time left when there's a timer.</p>
+
+      <h2>Duration knob</h2>
+      <ul>
+        <li><b>∞</b>: until you switch it off.</li>
+        <li><b>5 … 45</b> (minutes) and <b>1H … 12H</b> (hours): a timer. Turning the knob during a session restarts the timer from now.
+        An amber ring around the knob drains back toward ∞ as the time runs out.</li>
+        <li><b>SET</b>: any length (like 1 h 30 min), a clock time ("until 6:30 PM"), while one app is running,
+        or while a file downloads.</li>
+      </ul>
+      <p><b>TIME LEFT</b> counts down; <b>AWAKE FOR</b> shows how long it's been on. Under an hour they show minutes and seconds,
+      above that hours and minutes (the small print under each says which). Turn the knob by grabbing its edge, scroll over it,
+      or click a label. Double-click it for ∞.</p>
+
+      <h2>Keep awake</h2>
+      <ul>
+        <li><b>DISPLAY + MAC</b>: the screen stays on too.</li>
+        <li><b>MAC ONLY</b>: the screen may go dark as usual, but the Mac keeps working: downloads, renders, uploads, backups.</li>
+      </ul>
+
+      <h2>Screen saver</h2>
+      <p><b>BLOCK</b> tells macOS you're still there, so the screen saver and the lock screen don't start
+      (with DISPLAY + MAC). It needs no special permissions.</p>
+
+      <h2>Auto</h2>
+      <p>Lets the Mac stay awake by itself, even with the power button off:</p>
+      <ul>
+        <li><b>APPS</b>: while any app lit in the list is open. Click an app in the list to watch it (green = open now).</li>
+        <li><b>AUDIO</b>: while anything plays or records sound, with a 30-second grace for gaps between songs or takes.</li>
+        <li><b>DOWNLOADS</b>: while a browser download is in progress in your Downloads folder.</li>
+        <li><b>AT LOGIN</b>: opens ProtoArt Wake when you log in (in standby).</li>
+      </ul>
+      <p>If you switch it off while an Auto rule is holding the Mac awake, Auto waits until that reason goes away.</p>
+
+      <h2>Lamps and status</h2>
+      <ul>
+        <li><b>HELD</b> (green): macOS has confirmed the hold. It blinks while waiting for confirmation.</li>
+        <li><b>TIMER</b>: a timer is running. <b>AUTO</b>: an Auto rule is on.</li>
+        <li>The amber window shows your Mac's normal sleep settings and which other apps are keeping it awake.</li>
+      </ul>
+
+      <h2>Menu bar</h2>
+      <p>Right-click the tube for <b>End</b> and <b>Extend Session</b>, <b>Indefinitely</b>, <b>Minutes</b>, <b>Hours</b>, <b>Other Time / Until</b>,
+      <b>While App Is Running</b>, <b>While File Is Downloading</b>, and <b>Quick Settings</b>.
+      Press <b>⌃⌥⌘W</b> anywhere to switch it on or off.</p>
+
+      <h2>Set up</h2>
+      <p><b>SETUP</b> opens the Set-up Card: more triggers (a schedule, the power adapter, an external display,
+      a drive, a busy processor), when sessions end by themselves (low battery, unplugging, sleep, switching user),
+      reminders with <b>Extend</b> buttons, sounds, how the menu-bar tube looks and behaves, Drive Alive and statistics.</p>
+
+      <h2>Pin</h2>
+      <p><b>PIN</b> keeps this panel open and floating on top. Drag it anywhere by the brand plate or the tube;
+      it remembers where you put it. Unpin to go back to a drop-down under the menu-bar tube.
+      Opening ProtoArt Wake from Applications shows this panel too.</p>
+
+      <h2>Lights out · Quit</h2>
+      <p><b>LIGHTS OUT</b> turns the display off now (moving the mouse wakes it). <b>QUIT</b> closes the app and the Mac
+      goes back to its normal sleep settings.</p>
+
+      <h2>Good to know</h2>
+      <ul>
+        <li>If the app quits or crashes, macOS drops the hold immediately: your Mac can't get stuck awake.</li>
+        <li>A laptop still sleeps when you close the lid (unless an external display is connected), and
+        ProtoArt Wake stops on its own at 10% battery (change it under SETUP).</li>
+        <li>Nothing is uploaded and the app makes no network connections.</li>
+      </ul>
+      <p class="foot">ProtoArt Wake · Model PW-2 · v2.0 · Apache-2.0</p>
+    </div>
+  </div>
+
+  <!-- Set up: triggers, session rules, menu bar, Drive Alive, statistics -->
+  <div id="setup" class="sheet" hidden>
+    <div class="paper form" role="dialog" aria-label="Set up">
+      <button class="close" data-close title="Close (Esc)">×</button>
+      <h1>Set-up Card</h1>
+      <p class="lede">Fill in the boxes. Everything takes effect at once.</p>
+
+      <section>
+        <h2>Triggers: stay awake by themselves</h2>
+        <label class="chk"><input type="checkbox" data-pref="trigSchedule"> On a schedule</label>
+        <div class="line sub">
+          <span class="days" id="s-days"></span>
+        </div>
+        <div class="line sub">from <input type="time" data-pref="schedStart" data-time> to <input type="time" data-pref="schedEnd" data-time></div>
+        <label class="chk" id="s-power-row"><input type="checkbox" data-pref="trigPower"> While the power adapter is connected</label>
+        <label class="chk"><input type="checkbox" data-pref="trigDisplay"> While an external display is connected</label>
+        <label class="chk"><input type="checkbox" data-pref="trigCPU"> While the processor is busy, above
+          <select data-pref="cpuPercent" data-num><option>20</option><option>30</option><option>40</option><option>50</option><option>60</option><option>75</option></select>%</label>
+        <p class="note sub" id="s-cpu"></p>
+        <label class="chk"><input type="checkbox" data-pref="trigDrive"> While one of these drives is connected:</label>
+        <div class="drives sub" id="s-trig-drives"></div>
+        <p class="note">The APPS, AUDIO and DOWNLOADS buttons on the panel are triggers too.</p>
+      </section>
+
+      <section>
+        <h2>Sessions</h2>
+        <label class="chk"><input type="checkbox" data-pref="startAtLaunch"> Start a session when ProtoArt Wake opens</label>
+        <label class="chk"><input type="checkbox" data-pref="startAfterWake"> Start a session after the Mac wakes from sleep</label>
+        <div class="line chk-line">End a session on battery below
+          <select data-pref="endBattery" data-num><option value="0">never</option><option>5</option><option>10</option><option>15</option><option>20</option><option>30</option><option>50</option></select>%</div>
+        <label class="chk" id="s-unplug-row"><input type="checkbox" data-pref="endOnUnplug"> End a session when the power adapter is unplugged</label>
+        <label class="chk"><input type="checkbox" data-pref="endOnSleep"> End a session if the Mac is put to sleep anyway (lid, Apple menu)</label>
+        <label class="chk"><input type="checkbox" data-pref="endOnUserSwitch"> End a session when you switch to another user</label>
+        <label class="chk"><input type="checkbox" data-pref="lockedDisplaySleep"> Let the display sleep while the screen is locked</label>
+      </section>
+
+      <section>
+        <h2>Reminders and sounds</h2>
+        <div class="line chk-line">Remind me
+          <select data-pref="remindMinutes" data-num><option value="0">never</option><option value="1">1 minute</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select>
+          before a timer runs out</div>
+        <label class="chk"><input type="checkbox" data-pref="notify"> Notify me when a session ends by itself</label>
+        <label class="chk"><input type="checkbox" data-pref="sounds"> Play a sound when a session starts and ends</label>
+      </section>
+
+      <section>
+        <h2>Menu bar</h2>
+        <label class="chk"><input type="checkbox" data-pref="menuTime"> Show the time left next to the tube</label>
+        <div class="line chk-line">Time format
+          <select data-pref="menuFormat"><option value="short">1h 05m</option><option value="clock">1:05</option></select></div>
+        <label class="chk"><input type="checkbox" data-pref="dimIdle"> Dim the tube in standby</label>
+        <div class="line chk-line">Clicking the tube
+          <select data-pref="leftClick"><option value="panel">opens this panel</option><option value="toggle">starts / ends a session</option></select></div>
+        <p class="note">Right-click (or Control-click) always opens the quick menu.</p>
+        <label class="chk"><input type="checkbox" data-pref="hotkey"> ⌃⌥⌘W anywhere starts / ends a session</label>
+      </section>
+
+      <section>
+        <h2>Drive Alive</h2>
+        <label class="chk"><input type="checkbox" data-pref="driveAlive"> Keep these drives spinning during a session:</label>
+        <div class="drives sub" id="s-alive-drives"></div>
+        <p class="note">Writes a tiny hidden file (.protoart-wake-alive) once a minute so the drive doesn't park.</p>
+      </section>
+
+      <section>
+        <h2>Statistics</h2>
+        <div id="s-stats" class="stats"></div>
+        <div class="line"><button class="go wide" id="s-reset">RESET</button></div>
+      </section>
+
+      <section>
+        <h2>Links and Shortcuts</h2>
+        <p>Run these from Shortcuts, Terminal (<code>open "…"</code>) or any app:</p>
+        <ul class="mono">
+          <li>protoart-wake://start</li>
+          <li>protoart-wake://start?minutes=90</li>
+          <li>protoart-wake://start?until=18:30</li>
+          <li>protoart-wake://extend?minutes=30</li>
+          <li>protoart-wake://end · toggle · panel · lights-out</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="texture.js"></script>
+<script src="parts.js"></script>
+<script src="wake.js"></script>
+</body>
+</html>
