@@ -120,6 +120,7 @@ final class PanelController: NSObject, WKNavigationDelegate, NSWindowDelegate {
         win.contentView = content
 
         self.window = win; self.web = web; self.overlay = ov
+        scale = 1 // a fresh window is full size: show() fits it to the screen
         loaded = false
         web.loadFileURL(rendererDir.appendingPathComponent("index.html"), allowingReadAccessTo: rendererDir)
         applyPin()
@@ -137,18 +138,36 @@ final class PanelController: NSObject, WKNavigationDelegate, NSWindowDelegate {
 
     // ------------------------------------------------------------------ Showing and hiding
 
+    /// The panel is drawn for W × H. On a screen with less room under the menu bar (a 13" MacBook at a larger text
+    /// size, say) the whole panel, window and page together, is scaled down to fit (to 70% at most), so LIGHTS OUT,
+    /// QUIT and the bottom of the cards stay on screen. Nothing changes on taller screens.
+    private var scale: CGFloat = 1
+    private func fit(_ win: NSWindow, area: NSRect, top: CGFloat) {
+        let z = max(0.7, min(1, (top - area.minY - 6) / Self.H))
+        guard abs(z - scale) > 0.001 else { return }
+        scale = z
+        win.setContentSize(NSSize(width: (Self.W * z).rounded(), height: (Self.H * z).rounded()))
+        web?.pageZoom = z
+    }
+
     func show(menu: String? = nil) {
         teardown?.cancel(); teardown = nil
         if window == nil { build() }
         guard let win = window else { return }
         if let m = menu { if loaded { sendMenu(m) } else { pendingMenu = m } }
-        if let p = pinnedOrigin() { win.setFrameOrigin(p) }
-        else if let f = core.statusButtonFrame() {
+        if let p = pinnedOrigin() {
+            let top = p.y + Self.H // where the user pinned its top edge
+            let screen = NSScreen.screens.first(where: { $0.visibleFrame.insetBy(dx: -10, dy: -10).contains(NSPoint(x: p.x + 40, y: top - 10)) }) ?? NSScreen.main
+            fit(win, area: screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900), top: top)
+            win.setFrameOrigin(NSPoint(x: p.x, y: (top - Self.H * scale).rounded()))
+        } else if let f = core.statusButtonFrame() {
             let screen = NSScreen.screens.first(where: { $0.frame.contains(NSPoint(x: f.midX, y: f.midY)) }) ?? NSScreen.main
             let area = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-            let x = min(max(f.midX - Self.W / 2, area.minX + 6), area.maxX - Self.W - 6)
             let top = min(f.minY - 6, area.maxY - 6)
-            win.setFrameOrigin(NSPoint(x: x.rounded(), y: max(area.minY + 6, top - Self.H).rounded()))
+            fit(win, area: area, top: top)
+            let w = Self.W * scale, h = Self.H * scale
+            let x = min(max(f.midX - w / 2, area.minX + 6), area.maxX - w - 6)
+            win.setFrameOrigin(NSPoint(x: x.rounded(), y: max(area.minY + 6, top - h).rounded()))
         } else {
             win.center()
         }
