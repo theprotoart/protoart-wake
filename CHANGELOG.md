@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4
+
+- Clicking the menu-bar icon while the panel is open closes it again. Before, the panel closed on the press and the click opened it straight back up, so the icon seemed not to respond.
+
 ## 2.0.3
 
 - The panel fits short screens: where there's less room under the menu bar than the panel's height (a 13" MacBook

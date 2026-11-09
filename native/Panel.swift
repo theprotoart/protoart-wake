@@ -179,16 +179,25 @@ final class PanelController: NSObject, WKNavigationDelegate, NSWindowDelegate {
 
     func hide() {
         guard let win = window, win.isVisible else { return }
+        hiddenAt = Date()
         win.orderOut(nil)
         let item = DispatchWorkItem { [weak self] in self?.destroy() }
         teardown = item
         DispatchQueue.main.asyncAfter(deadline: .now() + 20, execute: item) // reopening soon stays instant
     }
 
-    func toggle() { if isOpen { hide() } else { show() } }
+    /// When the panel lost focus to a press on the menu-bar icon, it closed on the press: the click that follows
+    /// must leave it closed instead of opening it again (which made the icon seem not to respond).
+    private var hiddenAt = Date.distantPast
+    func toggle() {
+        if isOpen { hide() }
+        else if Date().timeIntervalSince(hiddenAt) > 0.5 { show() }
+    }
 
     func windowDidResignKey(_ notification: Notification) {
         // Close like a menu when you click elsewhere (but not in the instant it's being opened).
+        // A press on the menu-bar icon is left to the icon's own click, which closes it.
+        if let f = core.statusButtonFrame(), f.insetBy(dx: -2, dy: -2).contains(NSEvent.mouseLocation) { return }
         if !core.settings.pinned && Date().timeIntervalSince(shownAt) > 0.4 { hide() }
     }
 

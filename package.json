@@ -1,7 +1,7 @@
 {
   "name": "protoart-wake",
   "productName": "ProtoArt Wake",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Keeps your Mac awake from the menu bar, using macOS\u2019s own power assertions. A native macOS app (Apple Silicon and Intel).",
   "private": true,
   "license": "Apache-2.0",
