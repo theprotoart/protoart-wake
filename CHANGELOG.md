@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+
+- The panel fits short screens: where there's less room under the menu bar than the panel's height (a 13" MacBook
+  at a larger text size, say), the whole panel scales down to fit (to 70% at most), so LIGHTS OUT, QUIT and the
+  bottom of the About and Setup cards stay on screen. Nothing changes on taller screens.
+
 ## 2.0.2
 
 - Finer duration knob: ∞, 5, 10, 15, 20, 30, 45 minutes, 1, 1½, 2, 3, 4, 6, 8, 12 hours, SET. Your saved choice

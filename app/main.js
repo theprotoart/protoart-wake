@@ -287,11 +287,24 @@ function pinnedPosition() {
   return onScreen ? [settings.pinX, settings.pinY] : null;
 }
 
+// The panel is drawn for 440 × 772. On a screen with less room under the menu bar (a 13" MacBook at a larger text
+// size, say), the whole panel is scaled down to fit, so its bottom row (LIGHTS OUT, QUIT) and the cards stay on screen.
+const PANEL_W = 440, PANEL_H = 772;
+function fitPanel(area, top) {
+  const room = area.y + area.height - top - 6;
+  const z = Math.max(0.7, Math.min(1, room / PANEL_H));
+  const w = Math.round(PANEL_W * z), h = Math.round(PANEL_H * z);
+  const [cw, ch] = win.getContentSize();
+  if (cw !== w || ch !== h) win.setContentSize(w, h);
+  if (Math.abs(win.webContents.getZoomFactor() - z) > 0.001) win.webContents.setZoomFactor(z);
+}
+
 function showPanel() {
   if (!win) return;
   lastSettingsRead = 0;
   const pinned = pinnedPosition();
   if (pinned) {
+    fitPanel(screen.getDisplayNearestPoint({ x: pinned[0], y: pinned[1] }).workArea, pinned[1]);
     win.setPosition(pinned[0], pinned[1], false);
     shownAt = Date.now();
     app.focus({ steal: true });
@@ -300,11 +313,12 @@ function showPanel() {
     return;
   }
   const b = tray.getBounds();
-  const [w, h] = win.getSize();
   const display = screen.getDisplayNearestPoint({ x: b.x, y: b.y });
   const area = display.workArea;
-  const x = Math.round(Math.min(Math.max(b.x + b.width / 2 - w / 2, area.x + 6), area.x + area.width - w - 6));
   const y = Math.round(b.y + b.height + 6 > area.y ? b.y + b.height + 6 : area.y + 6);
+  fitPanel(area, y);
+  const [w] = win.getSize();
+  const x = Math.round(Math.min(Math.max(b.x + b.width / 2 - w / 2, area.x + 6), area.x + area.width - w - 6));
   win.setPosition(x, y, false);
   shownAt = Date.now();
   app.focus({ steal: true }); // a menu-bar app isn't active: make the panel key so clicks land
